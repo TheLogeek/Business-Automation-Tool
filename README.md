@@ -1,5 +1,7 @@
 # 🚀 AI-Powered Business Automation Tool
 
+[Use the Live App](https://Business-Automation-Tool.streamlit.app)
+
 A professional-grade Python application designed to help businesses, educators, and vendors transform messy data into clean, analysis-ready datasets and actionable insights in seconds.
 
 Built with **Streamlit**, **Pandas**, and advanced data-processing logic, this tool automates real-world data cleaning tasks that typically require hours of manual effort.
