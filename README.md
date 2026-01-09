@@ -43,6 +43,15 @@ Supports both **CSV** and **Excel (.xlsx)** formats. Features a secure file uplo
 
 ---
 
+## Screenshots
+
+![Screenshot 1](screenshots/screenshot1)
+![Screenshot 2](screenshots/screenshot2)
+![Screenshot 3](screenshots/screenshot3)
+![Screenshot 4](screenshots/screenshot4)
+![Screenshot 5](screenshots/screenshot5)
+![Screenshot 6](screenshots/screenshot6)
+
 ## 📦 Installation & Setup
 
 1. **Clone the repository:**
