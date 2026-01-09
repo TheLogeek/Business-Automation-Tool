@@ -108,7 +108,7 @@ The result is a **clean, structured, and analysis-ready dataset** without user-w
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/your-username/business-automation-tool.git
+git clone https://github.com/TheLogeek/Business-Automation-Tool.git
 cd business-automation-tool
 ```
 
