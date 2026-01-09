@@ -49,7 +49,7 @@ Supports both **CSV** and **Excel (.xlsx)** formats. Features a secure file uplo
    ```bash
    git clone [https://github.com/your-username/business-automation-tool.git](https://github.com/your-username/business-automation-tool.git)
    cd business-automation-tool
-````
+```
 
 2.  **Install dependencies:**
 
