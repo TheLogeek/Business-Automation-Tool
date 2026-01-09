@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import io
 import tempfile
 from fpdf import FPDF
+import numpy as np
 
 st.set_page_config(page_title="AI Business Automator", layout="wide")
 
@@ -35,12 +36,44 @@ if st.session_state.data_loaded:
 
     st.subheader("🧹 Data Cleaning & Validation")
     if st.button("Auto-Clean Data") and not st.session_state.data_cleaned:
-        df = st.session_state.df
+        df = st.session_state.df.copy()
+
+        df.columns = (
+            df.columns.str.strip()
+            .str.lower()
+            .str.replace(" ", "_")
+        )
+
+        df = df.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+
         duplicates = df.duplicated().sum()
         df.drop_duplicates(inplace=True)
 
         for col in df.columns:
-            if df[col].dtype == 'object':
+            if df[col].dtype == "object":
+                try:
+                    converted = pd.to_numeric(df[col])
+                    if converted.notna().sum() > len(df) * 0.6:
+                        df[col] = converted
+                except:
+                    pass
+
+        for col in df.select_dtypes(include=["number"]).columns:
+            q1 = df[col].quantile(0.25)
+            q3 = df[col].quantile(0.75)
+            iqr = q3 - q1
+            lower = q1 - 1.5 * iqr
+            upper = q3 + 1.5 * iqr
+            df[col] = df[col].clip(lower, upper)
+
+        for col in df.columns:
+            if df[col].dtype == "object":
+                parsed_dates = pd.to_datetime(df[col], errors="coerce")
+                if parsed_dates.notna().sum() > len(df) * 0.6:
+                    df[col] = parsed_dates
+
+        for col in df.columns:
+            if df[col].dtype == "object":
                 df[col] = df[col].fillna("Unknown")
             else:
                 df[col] = df[col].fillna(df[col].median())
@@ -49,28 +82,24 @@ if st.session_state.data_loaded:
         st.session_state.data_cleaned = True
 
         st.write(f"✔️ Removed {duplicates} duplicates")
-        st.write("✔️ Fixed missing values.")
+        st.write("✔️ Fixed missing values, outliers, data types, and formatting")
         st.dataframe(df.head(10))
 
 if st.session_state.data_cleaned:
     df = st.session_state.df
 
     st.header("Step 3: Key Business Metrics")
-    numeric_cols = df.select_dtypes(include=['number']).columns
+    numeric_cols = df.select_dtypes(include=["number"]).columns
 
     if len(numeric_cols) > 0:
         m1, m2, m3 = st.columns(3)
         main_col = numeric_cols[0]
 
-        total_val = df[main_col].sum()
-        avg_val = df[main_col].mean()
-        count_val = len(df)
-
-        m1.metric(label=f"Total {main_col}", value=f"{total_val:,.2f}")
-        m2.metric(label=f"Average {main_col}", value=f"{avg_val:,.2f}")
-        m3.metric(label="Total Records", value=count_val)
+        m1.metric(f"Total {main_col}", f"{df[main_col].sum():,.2f}")
+        m2.metric(f"Average {main_col}", f"{df[main_col].mean():,.2f}")
+        m3.metric("Total Records", len(df))
     else:
-        st.warning("No numeric columns found to calculate metrics")
+        st.warning("No numeric columns found")
 
     st.header("Step 4: Data Visualization")
     chart_type = st.selectbox("Select Chart Type", ["Bar Chart", "Line Chart", "Pie Chart"])
@@ -79,66 +108,49 @@ if st.session_state.data_cleaned:
     fig, ax = plt.subplots()
 
     if chart_type == "Bar Chart":
-        x_axis = st.selectbox("Select X-axis (Category)", all_cols)
-        if len(numeric_cols) > 0:
-            y_axis = st.selectbox("Select Y-axis (Values)", numeric_cols)
-            df.groupby(x_axis)[y_axis].sum().plot(kind='bar', ax=ax, color='skyblue')
-            ax.set_title(f"{y_axis} by {x_axis}")
-            st.pyplot(fig)
-        else:
-            st.error("Cannot create Bar Chart without numeric columns.")
+        x = st.selectbox("Select X-axis", all_cols)
+        y = st.selectbox("Select Y-axis", numeric_cols)
+        df.groupby(x)[y].sum().plot(kind="bar", ax=ax)
+        st.pyplot(fig)
 
     elif chart_type == "Line Chart":
-        if len(numeric_cols) > 0:
-            y_axis = st.selectbox("Select Trend Column", numeric_cols)
-            ax.plot(df.index, df[y_axis], marker='o', color='green')
-            ax.set_title(f"Trend of {y_axis}")
-            st.pyplot(fig)
-        else:
-            st.error("Cannot create Line Chart without numeric columns.")
+        y = st.selectbox("Select Trend Column", numeric_cols)
+        ax.plot(df.index, df[y])
+        st.pyplot(fig)
 
     elif chart_type == "Pie Chart":
-        cat_col = st.selectbox("Select Category Column", all_cols)
-        df[cat_col].value_counts().plot(kind='pie', autopct='%1.1f%%', ax=ax)
-        ax.set_ylabel('')
+        cat = st.selectbox("Select Category Column", all_cols)
+        df[cat].value_counts().plot(kind="pie", autopct="%1.1f%%", ax=ax)
+        ax.set_ylabel("")
         st.pyplot(fig)
 
     st.divider()
     st.header("Step 5: Export Results")
-    ex_col1, ex_col2 = st.columns(2)
+    ex1, ex2 = st.columns(2)
 
-    with ex_col1:
+    with ex1:
         buffer = io.BytesIO()
-        with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-            df.to_excel(writer, sheet_name='Cleaned Data', index=False)
+        with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
+            df.to_excel(writer, index=False)
+        st.download_button("📥 Download Cleaned Excel", buffer.getvalue(), "cleaned_data.xlsx")
 
-        st.download_button(
-            label="📥 Download Cleaned Excel",
-            data=buffer.getvalue(),
-            file_name="cleaned_data.xlsx",
-            mime="application/vnd.ms-excel"
-        )
-
-    with ex_col2:
+    with ex2:
         if st.button("Generate PDF Report"):
             pdf = FPDF()
             pdf.add_page()
-            pdf.set_font("Arial", 'B', 16)
-            pdf.cell(200, 10, txt="Business Intelligence Report", ln=True, align='C')
-
+            pdf.set_font("Arial", "B", 16)
+            pdf.cell(200, 10, "Business Intelligence Report", ln=True, align="C")
             pdf.set_font("Arial", size=12)
-            pdf.ln(10)
-            pdf.cell(200, 10, txt=f"Total Records: {len(df)}", ln=True)
+            pdf.cell(200, 10, f"Total Records: {len(df)}", ln=True)
 
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmpfile:
-                fig.savefig(tmpfile.name, format="png")
-                pdf.image(tmpfile.name, x=10, y=50, w=180)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp:
+                fig.savefig(tmp.name)
+                pdf.image(tmp.name, x=10, y=40, w=180)
 
-            pdf_output = pdf.output(dest='S').encode('latin-1')
             st.download_button(
-                label="📩 Download PDF Report",
-                data=pdf_output,
-                file_name="Business_Report.pdf",
+                "📩 Download PDF Report",
+                pdf.output(dest="S").encode("latin-1"),
+                "Business_Report.pdf",
                 mime="application/pdf"
             )
 
