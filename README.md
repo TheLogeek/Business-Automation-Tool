@@ -109,7 +109,7 @@ The result is a **clean, structured, and analysis-ready dataset** without user-w
 1. **Clone the repository**
 ```bash
 git clone https://github.com/TheLogeek/Business-Automation-Tool.git
-cd business-automation-tool
+cd Business-Automation-Tool
 ```
 
 2.  **Install dependencies:**
