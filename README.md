@@ -1,49 +1,99 @@
 # 🚀 AI-Powered Business Automation Tool
 
-A professional-grade Python application designed to help businesses, educators, and vendors transform messy data into actionable insights in seconds.
+A professional-grade Python application designed to help businesses, educators, and vendors transform messy data into clean, analysis-ready datasets and actionable insights in seconds.
 
-Built with **Streamlit**, **Pandas**, and **AI-Logic**, this tool eliminates hours of manual data entry and cleaning.
+Built with **Streamlit**, **Pandas**, and advanced data-processing logic, this tool automates real-world data cleaning tasks that typically require hours of manual effort.
 
 ---
 
 ## 🌟 Why This Project?
-Small and Medium Enterprises (SMEs) in Nigeria often struggle with disorganized sales records, student data, and inventory lists. This tool provides a "one-click" solution to:
-* **Stop Manual Cleaning:** Automatically handle duplicates and missing values.
-* **Instant KPI Tracking:** See Total Sales, Averages, and Volume immediately.
-* **Visual Intelligence:** Generate Bar, Line, and Pie charts to understand trends.
-* **Professional Reporting:** Export results to Excel or a formal PDF report.
+
+Small and Medium Enterprises (SMEs) in Nigeria often struggle with disorganized sales records, staff data, student results, and inventory files coming from multiple sources.
+
+This project demonstrates how automation can solve these challenges by providing a **one-click data cleaning and analysis workflow** that turns raw spreadsheets into reliable business intelligence.
+
+Key goals:
+- Eliminate repetitive manual cleaning
+- Standardize inconsistent datasets
+- Enable instant analysis and reporting
+- Showcase real-world data engineering skills
 
 ---
 
 ## 🛠️ Tech Stack
-* **Language:** Python 3.10+
-* **Framework:** [Streamlit](https://streamlit.io/) (Web Interface)
-* **Data Processing:** [Pandas](https://pandas.pydata.org/)
-* **Visualization:** [Matplotlib](https://matplotlib.org/)
-* **Reporting:** [FPDF](http://pyfpdf.readthedocs.io/) & [XlsxWriter](https://xlsxwriter.readthedocs.io/)
+
+- **Language:** Python 3.10+
+- **Framework:** [Streamlit](https://streamlit.io/) (Web Interface)
+- **Data Processing:** [Pandas](https://pandas.pydata.org/)
+- **Visualization:** [Matplotlib](https://matplotlib.org/)
+- **Reporting:** [FPDF](http://pyfpdf.readthedocs.io/) & [XlsxWriter](https://xlsxwriter.readthedocs.io/)
 
 ---
 
 ## 🚀 Features & Functionality
 
 ### 1. Smart Data Ingestion
-Supports both **CSV** and **Excel (.xlsx)** formats. Features a secure file uploader and a raw data previewer.
-
-### 2. Auto-Cleaning Engine
-* Detects and removes duplicate entries.
-* Intelligent Imputation: Uses **Median** values for missing numbers and **Categorical Fill** for missing text to ensure data integrity.
-
-### 3. Interactive Analytics Dashboard
-* **Real-time Metrics:** Calculation of key performance indicators (KPIs) like total revenue or average scores.
-* **Dynamic Charts:** Users can toggle between different chart types and select custom axes for bespoke analysis.
-
-### 4. Professional Exporting
-* **Clean Data Download:** Export the sanitized dataset back to Excel.
-* **PDF Report Generation:** Captures current charts and metrics into a formatted PDF document ready for meetings or records.
+- Supports **CSV** and **Excel (.xlsx)** files
+- Secure file upload
+- Instant raw data preview before processing
 
 ---
 
-## Screenshots
+### 2. Advanced Auto-Cleaning Engine
+Automatically prepares messy datasets for analysis by performing:
+
+- **Duplicate Detection & Removal**
+  - Identifies and removes exact duplicate rows
+
+- **Missing Value Handling**
+  - Numeric columns filled using **median imputation**
+  - Categorical/text columns filled with consistent placeholders
+
+- **Column Name Normalization**
+  - Trims whitespace
+  - Converts to lowercase
+  - Replaces spaces with underscores for consistency
+
+- **Global Whitespace Cleanup**
+  - Removes hidden spaces from text fields that often break analysis
+
+- **Automatic Data Type Correction**
+  - Converts numeric columns stored as text into proper numeric types
+  - Safely ignores columns that should remain categorical
+
+- **Date Parsing & Standardization**
+  - Detects date columns automatically
+  - Converts mixed date formats into a unified datetime format
+
+- **Outlier Handling**
+  - Identifies extreme numeric values using the IQR method
+  - Clips outliers to reduce distortion in metrics and charts
+
+The result is a **clean, structured, and analysis-ready dataset** without user-written rules.
+
+---
+
+### 3. Interactive Analytics Dashboard
+- **Real-Time KPIs**
+  - Automatic calculation of totals, averages, and record counts
+- **Dynamic Visualizations**
+  - Bar Charts, Line Charts, and Pie Charts
+  - User-selectable axes and categories
+- Designed for non-technical users to explore data intuitively
+
+---
+
+### 4. Professional Reporting & Export
+- **Excel Export**
+  - Download the fully cleaned dataset for reuse or archival
+- **PDF Report Generation**
+  - Generates a formal business report
+  - Includes key metrics and visualizations
+  - Suitable for presentations, audits, or client delivery
+
+---
+
+## 📸 Screenshots
 
 ![Screenshot 1](screenshots/screenshot1)
 ![Screenshot 2](screenshots/screenshot2)
@@ -52,12 +102,14 @@ Supports both **CSV** and **Excel (.xlsx)** formats. Features a secure file uplo
 ![Screenshot 5](screenshots/screenshot5)
 ![Screenshot 6](screenshots/screenshot6)
 
+---
+
 ## 📦 Installation & Setup
 
-1. **Clone the repository:**
+1. **Clone the repository**
    ```bash
-   git clone [https://github.com/your-username/business-automation-tool.git](https://github.com/your-username/business-automation-tool.git)
-   cd business-automation-tool
+git clone https://github.com/your-username/business-automation-tool.git
+cd business-automation-tool
    ```
 
 2.  **Install dependencies:**
