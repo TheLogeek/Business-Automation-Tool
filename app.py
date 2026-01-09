@@ -10,43 +10,52 @@ st.set_page_config(page_title="AI Business Automator", layout="wide")
 st.title("🚀 Smart Business Automation Tool")
 st.markdown("Upload your messy Excel or CSV files to clean, analyze, and report in seconds.")
 
-# File Uploading
+if "data_loaded" not in st.session_state:
+    st.session_state.data_loaded = False
+if "data_cleaned" not in st.session_state:
+    st.session_state.data_cleaned = False
+if "df" not in st.session_state:
+    st.session_state.df = None
+
 st.header("Step 1: Upload Data")
 uploaded_file = st.file_uploader("Choose an Excel or CSV file", type=['csv', 'xlsx'])
 
-if uploaded_file is not None:
+if uploaded_file is not None and not st.session_state.data_loaded:
     if uploaded_file.name.endswith('.csv'):
-        df = pd.read_csv(uploaded_file)
+        st.session_state.df = pd.read_csv(uploaded_file)
     else:
-        df = pd.read_excel(uploaded_file)
+        st.session_state.df = pd.read_excel(uploaded_file)
 
+    st.session_state.data_loaded = True
     st.success("✅ Data Loaded Successfully!")
 
-    # Data Preview
-    with st.expander("View Raw Data"):
+if st.session_state.data_loaded:
+    st.header("Step 2: Preview Data")
+    st.dataframe(st.session_state.df.head(10))
+
+    st.subheader("🧹 Data Cleaning & Validation")
+    if st.button("Auto-Clean Data") and not st.session_state.data_cleaned:
+        df = st.session_state.df
+        duplicates = df.duplicated().sum()
+        df.drop_duplicates(inplace=True)
+
+        for col in df.columns:
+            if df[col].dtype == 'object':
+                df[col] = df[col].fillna("Unknown")
+            else:
+                df[col] = df[col].fillna(df[col].median())
+
+        st.session_state.df = df
+        st.session_state.data_cleaned = True
+
+        st.write(f"✔️ Removed {duplicates} duplicates")
+        st.write("✔️ Fixed missing values.")
         st.dataframe(df.head(10))
 
-    # Data Cleaning
-    st.subheader("🧹 Data Cleaning & Validation")
-    col1, col2 = st.columns(2)
+if st.session_state.data_cleaned:
+    df = st.session_state.df
 
-    with col1:
-        if st.button("Auto-Clean Data"):
-            duplicates = df.duplicated().sum()
-            df.drop_duplicates(inplace=True)
-
-            for col in df.columns:
-                if df[col].dtype == 'object':
-                    df[col] = df[col].fillna("Unknown")
-                else:
-                    df[col] = df[col].fillna(df[col].median())
-
-            st.write(f"✔️ Removed {duplicates} duplicates")
-            st.write("✔️ Fixed missing values.")
-            st.dataframe(df.head(10))
-
-    # Business Metrics
-    st.subheader("📊 Key Business Metrics")
+    st.header("Step 3: Key Business Metrics")
     numeric_cols = df.select_dtypes(include=['number']).columns
 
     if len(numeric_cols) > 0:
@@ -63,11 +72,10 @@ if uploaded_file is not None:
     else:
         st.warning("No numeric columns found to calculate metrics")
 
-    # Data Visualization 
-    st.subheader("📈 Data Visualization")
+    st.header("Step 4: Data Visualization")
     chart_type = st.selectbox("Select Chart Type", ["Bar Chart", "Line Chart", "Pie Chart"])
     all_cols = df.columns.tolist()
-    
+
     fig, ax = plt.subplots()
 
     if chart_type == "Bar Chart":
@@ -95,17 +103,15 @@ if uploaded_file is not None:
         ax.set_ylabel('')
         st.pyplot(fig)
 
-    # 6. Exporting Section
     st.divider()
-    st.subheader("💾 Export Your Results")
+    st.header("Step 5: Export Results")
     ex_col1, ex_col2 = st.columns(2)
 
     with ex_col1:
-        # Excel Export
         buffer = io.BytesIO()
         with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
             df.to_excel(writer, sheet_name='Cleaned Data', index=False)
-        
+
         st.download_button(
             label="📥 Download Cleaned Excel",
             data=buffer.getvalue(),
@@ -114,22 +120,20 @@ if uploaded_file is not None:
         )
 
     with ex_col2:
-        # PDF Export
         if st.button("Generate PDF Report"):
             pdf = FPDF()
             pdf.add_page()
             pdf.set_font("Arial", 'B', 16)
             pdf.cell(200, 10, txt="Business Intelligence Report", ln=True, align='C')
-            
+
             pdf.set_font("Arial", size=12)
             pdf.ln(10)
             pdf.cell(200, 10, txt=f"Total Records: {len(df)}", ln=True)
-            
-            # Save the chart to a temp file and add to PDF
+
             with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmpfile:
                 fig.savefig(tmpfile.name, format="png")
                 pdf.image(tmpfile.name, x=10, y=50, w=180)
-            
+
             pdf_output = pdf.output(dest='S').encode('latin-1')
             st.download_button(
                 label="📩 Download PDF Report",
@@ -138,5 +142,5 @@ if uploaded_file is not None:
                 mime="application/pdf"
             )
 
-else:
+if uploaded_file is None:
     st.info("Please upload a file to begin.")
