@@ -107,10 +107,10 @@ The result is a **clean, structured, and analysis-ready dataset** without user-w
 ## 📦 Installation & Setup
 
 1. **Clone the repository**
-   ```bash
+```bash
 git clone https://github.com/your-username/business-automation-tool.git
 cd business-automation-tool
-   ```
+```
 
 2.  **Install dependencies:**
 
