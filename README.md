@@ -63,7 +63,7 @@ Supports both **CSV** and **Excel (.xlsx)** formats. Features a secure file uplo
     streamlit run app.py
     ```
 
------
+---
 
 ## 💡 Use Cases
 
@@ -71,7 +71,7 @@ Supports both **CSV** and **Excel (.xlsx)** formats. Features a secure file uplo
   * **Educators:** Organizing student grades and visualizing class performance averages.
   * **Freelance Data Analysts:** Using the tool as a base for rapid client data sanitization.
 
------
+---
 
 ## 👤 Author
 
@@ -81,6 +81,6 @@ Supports both **CSV** and **Excel (.xlsx)** formats. Features a secure file uplo
   * X (Twitter): https://x.com/TheLogeek
   * Portfolio: https://solomonadenuga.lovable.app
 
------
+---
 
 *“Turning messy data into growth opportunities.”*
