@@ -18,6 +18,31 @@ if "data_cleaned" not in st.session_state:
 if "df" not in st.session_state:
     st.session_state.df = None
 
+def text_to_number(val):
+    if not isinstance(val, str):
+        return val
+    words = {
+        "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+        "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+        "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50,
+        "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90,
+        "hundred": 100, "thousand": 1000
+    }
+    parts = val.lower().split()
+    total = 0
+    current = 0
+    for part in parts:
+        if part not in words:
+            return val
+        scale = words[part]
+        if scale == 100 or scale == 1000:
+            current = max(1, current) * scale
+            total += current
+            current = 0
+        else:
+            current += scale
+    return total + current
+
 st.header("Step 1: Upload Data")
 uploaded_file = st.file_uploader("Choose an Excel or CSV file", type=['csv', 'xlsx'])
 
@@ -51,6 +76,7 @@ if st.session_state.data_loaded:
 
         for col in df.columns:
             if df[col].dtype == "object":
+                df[col] = df[col].apply(text_to_number)
                 try:
                     converted = pd.to_numeric(df[col])
                     if converted.notna().sum() > len(df) * 0.6:
